@@ -1,0 +1,102 @@
+DECLARE @target_shop_id INT = 1; -- Replace with the desired shop_id
+
+SELECT
+    I.item_id,
+    I.name AS item_name,
+    I.description,
+    I.base_cost,
+    COALESCE(Materials.material_info, '') AS material_info,
+    COALESCE(Categories.category_info, '') AS category_info
+FROM
+    Items I
+LEFT JOIN (
+    SELECT
+        IM.item_id,
+        STRING_AGG(M.name + ' (' + CAST(IM.percentage AS NVARCHAR(10)) + '%' + ' - ' + LM.rarity + ')', ', ') AS material_info
+    FROM
+        Item_Materials IM
+    LEFT JOIN
+        Materials M ON IM.material_id = M.material_id
+    LEFT JOIN
+        Location_Materials LM ON LM.location_id = location_id AND LM.material_id = IM.material_id
+    GROUP BY
+        IM.item_id
+) AS Materials ON I.item_id = Materials.item_id
+
+LEFT JOIN (
+    SELECT
+        IC.item_id,
+        STRING_AGG(
+            C.name + ' (' + 
+            COALESCE(CAST(SC.category_quality AS NVARCHAR(10)), 
+                     CAST(SS.general_quality AS NVARCHAR(10))) + 
+            ')', ', '
+        ) AS category_info
+    FROM
+        Item_Categories IC
+    LEFT JOIN
+        Categories C ON IC.category_id = C.category_id
+    LEFT JOIN
+        Shop_Categories SC ON SC.shop_id = @target_shop_id AND SC.category_id = IC.category_id
+    LEFT JOIN
+        Shops SS ON SS.shop_id = @target_shop_id
+    GROUP BY
+        IC.item_id
+) AS Categories ON I.item_id = Categories.item_id
+
+LEFT JOIN Shop_Inventory SI ON I.item_id = SI.item_id
+WHERE
+    SI.shop_id = @target_shop_id;
+
+
+returns: 
+1	Dagger	A sharp weapon	10.00	Wood (0.30% - Very_Rare), Iron (0.70% - Abundant)	Weapons (Good), Consumables (Good)
+2	Longsword	A versatile weapon	20.00	Wood (0.50% - Very_Rare), Iron (0.50% - Abundant)	Weapons (Good)
+3	Leather Armor	Protective armor made of leather	15.00	Leather (1.00% - Very_Rare)	Armor (Good)
+
+SELECT
+    I.item_id,
+    I.name AS item_name,
+    I.description,
+    I.base_cost,
+    COALESCE(Materials.material_info, '') AS material_info,
+    COALESCE(Categories.category_names, '') AS category_names
+FROM
+    Items I
+LEFT JOIN (
+    SELECT
+        IM.item_id,
+        STRING_AGG(M.name + ' (' + CAST(IM.percentage AS NVARCHAR(10)) + '%)', ', ') AS material_info
+    FROM
+        Item_Materials IM
+    LEFT JOIN
+        Materials M ON IM.material_id = M.material_id
+    GROUP BY
+        IM.item_id
+) AS Materials ON I.item_id = Materials.item_id
+
+LEFT JOIN (
+    SELECT
+        IC.item_id,
+        STRING_AGG(C.name, ', ') AS category_names
+    FROM
+        Item_Categories IC
+    LEFT JOIN
+        Categories C ON IC.category_id = C.category_id
+    GROUP BY
+        IC.item_id
+) AS Categories ON I.item_id = Categories.item_id;
+
+returns: 
+1	Dagger	A sharp weapon	10.00	Wood (0.30%), Iron (0.70%)	Weapons, Consumables
+2	Longsword	A versatile weapon	20.00	Wood (0.50%), Iron (0.50%)	Weapons
+3	Leather Armor	Protective armor made of leather	15.00	Leather (1.00%)	Armor
+4	Health Potion	Restores health when consumed	5.00	String (1.00%)	
+5	Bow	A ranged weapon	18.00	Wood (0.90%), String (0.10%)	
+6	Plate Armor	Heavy armor for maximum protection	30.00	Iron (0.20%), Leather (0.80%)	
+7	Mana Elixir	Restores mana when consumed	8.00	String (1.00%)	
+8	Crystal Staff	A magical staff made of crystal	25.00	Crystal (1.00%)	
+
+
+
+
