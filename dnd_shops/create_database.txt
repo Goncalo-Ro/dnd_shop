@@ -1,0 +1,84 @@
+-- Create Materials Table
+CREATE TABLE Materials (
+    material_id INT PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL
+);
+
+-- Create Locations Table
+CREATE TABLE Locations (
+    location_id INT PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL
+);
+
+-- Create Location_Materials Table (Join Table)
+CREATE TABLE Location_Materials (
+    location_id INT,
+    material_id INT,
+    rarity NVARCHAR(20),
+    PRIMARY KEY (location_id, material_id),
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+-- Create Categories Table
+CREATE TABLE Categories (
+    category_id INT PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL
+);
+
+-- Create Items Table
+CREATE TABLE Items (
+    item_id INT PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL,
+    description NVARCHAR(MAX),
+    base_cost DECIMAL(10, 2),
+);
+
+-- Create Item_Materials Table (Join Table)
+CREATE TABLE Item_Materials (
+    item_id INT,
+    material_id INT,
+    percentage DECIMAL(5, 2) NOT NULL,
+    PRIMARY KEY (item_id, material_id),
+    FOREIGN KEY (item_id) REFERENCES Items(item_id),
+    FOREIGN KEY (material_id) REFERENCES Materials(material_id)
+);
+
+-- Create Item_Categories Table (Join Table)
+CREATE TABLE Item_Categories (
+    item_category_id INT IDENTITY(1,1) PRIMARY KEY,
+    item_id INT,
+    category_id INT,
+    FOREIGN KEY (item_id) REFERENCES Items(item_id),
+    FOREIGN KEY (category_id) REFERENCES Categories(category_id)
+);
+
+-- Create Shops Table
+CREATE TABLE Shops (
+    shop_id INT PRIMARY KEY,
+    name NVARCHAR(50) NOT NULL,
+    location_id INT,
+    general_quality NVARCHAR(20) NOT NULL,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+);
+
+-- Create Shop_Categories Table (Join Table)
+CREATE TABLE Shop_Categories (
+    shop_id INT,
+    category_id INT,
+    category_quality DECIMAL(5, 2),
+    PRIMARY KEY (shop_id, category_id),
+    FOREIGN KEY (shop_id) REFERENCES Shops(shop_id),
+    FOREIGN KEY (category_id) REFERENCES Categories(category_id)
+);
+
+-- Create Shop_Inventory Table
+CREATE TABLE Shop_Inventory (
+    shop_inventory_id INT IDENTITY(1,1) PRIMARY KEY,
+    shop_id INT,
+    item_id INT,
+    quantity INT,
+    shop_cost DECIMAL(10, 2),
+    FOREIGN KEY (shop_id) REFERENCES Shops(shop_id),
+    FOREIGN KEY (item_id) REFERENCES Items(item_id)
+);
