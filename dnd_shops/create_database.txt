@@ -46,9 +46,9 @@ CREATE TABLE Item_Materials (
 
 -- Create Item_Categories Table (Join Table)
 CREATE TABLE Item_Categories (
-    item_category_id INT IDENTITY(1,1) PRIMARY KEY,
     item_id INT,
     category_id INT,
+    PRIMARY KEY (item_id, category_id),
     FOREIGN KEY (item_id) REFERENCES Items(item_id),
     FOREIGN KEY (category_id) REFERENCES Categories(category_id)
 );
@@ -82,3 +82,89 @@ CREATE TABLE Shop_Inventory (
     FOREIGN KEY (shop_id) REFERENCES Shops(shop_id),
     FOREIGN KEY (item_id) REFERENCES Items(item_id)
 );
+
+-- Insert Materials
+INSERT INTO Materials (material_id, name) VALUES
+(1, 'Wood'),
+(2, 'Iron'),
+(3, 'Leather'),
+(4, 'String'),
+(5, 'Crystal');
+
+-- Insert Locations
+INSERT INTO Locations (location_id, name) VALUES
+(1, 'Location1'),
+(2, 'Location2');
+
+-- Insert Location_Materials (Specify material rarity for each location)
+INSERT INTO Location_Materials (location_id, material_id, rarity) VALUES
+(1, 1, 'Common'),  -- Wood in Location1 is Common
+(1, 2, 'Rare'),    -- Iron in Location1 is Rare
+(1, 3, 'Abundant'), -- Leather in Location1 is Abundant
+(1, 4, 'Not Available'), -- String in Location1 is Not Available
+(1, 5, 'Common'),  -- Crystal in Location1 is Common
+
+(2, 1, 'Abundant'), -- Wood in Location2 is Abundant
+(2, 2, 'Common'),   -- Iron in Location2 is Common
+(2, 3, 'Rare'),     -- Leather in Location2 is Rare
+(2, 4, 'Abundant'),  -- String in Location2 is Abundant
+(2, 5, 'Not Available'); -- Crystal in Location2 is Not Available
+
+-- Insert Categories
+INSERT INTO Categories (category_id, name) VALUES
+(1, 'Weapons'),
+(2, 'Consumables'),
+(3, 'Armor');
+
+-- Insert Items
+INSERT INTO Items (item_id, name, description, base_cost) VALUES
+(1, 'Dagger', 'A sharp weapon', 10.00),
+(2, 'Longsword', 'A versatile weapon', 20.00),
+(3, 'Leather Armor', 'Protective armor made of leather', 15.00),
+(4, 'Health Potion', 'Restores health when consumed', 5.00),
+(5, 'Bow', 'A ranged weapon', 18.00),
+(6, 'Plate Armor', 'Heavy armor for maximum protection', 30.00),
+(7, 'Mana Elixir', 'Restores mana when consumed', 8.00),
+(8, 'Crystal Staff', 'A magical staff made of crystal', 25.00);
+
+-- Insert Item_Materials (Specify materials and percentages for each item)
+INSERT INTO Item_Materials (item_id, material_id, percentage) VALUES
+(1, 1, 0.30), -- Dagger is 30% Wood
+(1, 2, 0.70), -- Dagger is 70% Iron
+
+(2, 1, 0.50), -- Longsword is 50% Wood
+(2, 2, 0.50), -- Longsword is 50% Iron
+
+(3, 3, 1.00), -- Leather Armor is 100% Leather
+
+(4, 4, 1.00), -- Health Potion is 100% String
+
+(5, 1, 0.90), -- Bow is 90% Wood
+(5, 4, 0.10), -- Bow is 10% String
+
+(6, 2, 0.20), -- Plate Armor is 20% Iron
+(6, 3, 0.80), -- Plate Armor is 80% Leather
+
+(7, 4, 1.00), -- Mana Elixir is 100% String
+
+(8, 5, 1.00); -- Crystal Staff is 100% Crystal
+
+-- Insert Item_Categories (Specify categories for each item)
+INSERT INTO Item_Categories (item_id, category_id) VALUES
+(1, 1), -- Dagger is in the Weapons category
+(1, 2), -- Dagger is in the Consumables category
+
+(2, 1), -- Longsword is in the Weapons category
+
+(3, 3), -- Leather Armor is in the Armor category
+
+(4, 2), -- Health Potion is in the Consumables category
+
+(5, 1), -- Bow is in the Weapons category
+
+(6, 3), -- Plate Armor is in the Armor category
+
+(7, 2), -- Mana Elixir is in the Consumables category
+
+(8, 1); -- Crystal Staff is in the Weapons category
+
